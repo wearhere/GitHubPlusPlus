@@ -10,6 +10,8 @@ For easy discoverability, the extension amends GitHub's site-wide keyboard short
 
 * Adds shortcuts to toggle between PR tabs and view diffs without whitespace.
 * Adds a button to view diffs without whitespace for people that prefer that.
+* Enables GitHub's file browser in PRs for the files that have changed in the PR, using Sublime
+Text-style fuzzy-matching logic.
 
 ## Installation
 

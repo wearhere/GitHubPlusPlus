@@ -21,6 +21,7 @@
 
     // Our global variables.
     "GPLUSPLUS": false,
+    "Templates": false,
 
     // Our classes.
     "ElementUtils": true,

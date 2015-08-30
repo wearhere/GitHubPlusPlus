@@ -38,36 +38,7 @@
   // Adds the above shortcuts to the site-wide keyboard shortcuts table
   // under the "Pull request list" section.
   function addPRShortcutsToPopup(popup) {
-    // TODO(jeff): Put this in a Handlebars template.
-    var shortcutTable = '<tbody class="js-hidden-pane">' +
-          '<tr>' +
-            '<th></th>' +
-            '<th>Pull requests (G++)</th>' +
-          '</tr>' +
-          '<tr>' +
-            '<td class="keys">' +
-              '<kbd><span class="platform-mac">⎇</span><span class="platform-other">alt</span> 1</kbd>' +
-            '</td>' +
-            '<td>View conversation</td>' +
-          '</tr>' +
-          '<tr>' +
-            '<td class="keys">' +
-              '<kbd><span class="platform-mac">⎇</span><span class="platform-other">alt</span> 2</kbd>' +
-            '</td>' +
-            '<td>View commits</td>' +
-          '</tr><tr>' +
-            '<td class="keys">' +
-              '<kbd><span class="platform-mac">⎇</span><span class="platform-other">alt</span> 3</kbd>' +
-            '</td>' +
-            '<td>View files</td>' +
-          '</tr><tr>' +
-            '<td class="keys">' +
-              '<kbd><span class="platform-mac">⎇</span><span class="platform-other">alt</span> shift 3</kbd>' +
-            '</td>' +
-            '<td>View files ignoring whitespace</td>' +
-          '</tr></tbody>';
-
-    popup.querySelector('.column.one-third:nth-child(3) table').innerHTML += shortcutTable;
+    popup.find('.column.one-third:nth-child(3) table').append(Templates.prShortcutsDescription());
   }
 
   var shortcutPopupObserver;
@@ -80,8 +51,8 @@
     // The popup is always present. Detect it being populated with the shortcuts
     // by the toggling of the '.shortcuts' class on the popup.
     shortcutPopupObserver = new MutationObserver(function(records) {
-      var shortcutPopup = document.querySelector('.facebox-content.shortcuts');
-      if (shortcutPopup) {
+      var shortcutPopup = $('.facebox-content.shortcuts');
+      if (shortcutPopup.length) {
         // The shortcut HTML is recreated every time.
         addPRShortcutsToPopup(shortcutPopup);
       }
