@@ -1,27 +1,28 @@
-(function() {
-  var prMatch = window.location.href.match(/pull\/\d+/);
-  if (!prMatch) return;
+/**
+ * Adds a button to PR pages to load the diff with the ignore whitespace button set.
+ */
+Router.on('start:pr', function(prRef) {
+  // When opening a PR from the PR list, GitHub will take a moment to load the PR _after_ already
+  // having changed the location.
+  ElementUtils.waitForElement('.js-pull-request-tab[href$="' + prRef + '/files"]', 3 * 1000)
+    .done(function(diffTab) {
+      var IGNORE_WHITESPACE_BUTTON_CLASS = 'js-gplusplus-ignore-whitespace';
 
-  var prRef = prMatch[0];
+      var ignoreWhitespaceButton = $('<button>')
+        .addClass(IGNORE_WHITESPACE_BUTTON_CLASS)
+        .text('Ignore Whitespace');
 
-  var diffTab = document.querySelector('.js-pull-request-tab[href$="' + prRef + '/files"]');
-  if (!diffTab) {
-    console.error('Could not find diff tab');
-    return;
-  }
+      diffTab.append(ignoreWhitespaceButton);
 
-  var IGNORE_WHITESPACE_BUTTON_CLASS = 'js-gplusplus-ignore-whitespace';
+      diffTab[0].addEventListener('click', function(e) {
+        if (!e.target.closest('.' + IGNORE_WHITESPACE_BUTTON_CLASS)) return;
 
-  var ignoreWhitespaceButton = document.createElement('button');
-  ignoreWhitespaceButton.classList.add(IGNORE_WHITESPACE_BUTTON_CLASS);
-  ignoreWhitespaceButton.innerText = "Ignore Whitespace";
-
-  diffTab.appendChild(ignoreWhitespaceButton);
-  diffTab.addEventListener('click', function(e) {
-    if (!e.target.closest('.' + IGNORE_WHITESPACE_BUTTON_CLASS)) return;
-
-    e.preventDefault();
-    e.stopPropagation();
-    window.location.href = window.location.href.replace(/(pull\/\d+).*/, '$1/files?w=1');
-  }, true /* capture */);
-})();
+        e.preventDefault();
+        e.stopPropagation();
+        window.location.href = window.location.href.replace(/(pull\/\d+).*/, '$1/files?w=1');
+      }, true /* capture */ );
+    })
+    .fail(function() {
+      console.error('Could not find diff tab');
+    });
+});

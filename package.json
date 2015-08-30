@@ -1,0 +1,27 @@
+{
+  "name": "GitHubPlusPlus",
+  "version": "0.0.0",
+  "description": "A Chrome extension that adds keyboard shortcuts and other stuff to GitHub.",
+  "devDependencies": {
+    "del": "^1.2.1",
+    "gulp": "^3.9.0",
+    "gulp-concat": "^2.6.0",
+    "gulp-order": "^1.1.1",
+    "gulp-wrapper": "^1.0.0",
+    "run-sequence": "^1.1.2"
+  },
+  "scripts": {
+    "start": "gulp",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/wearhere/GitHubPlusPlus.git"
+  },
+  "author": "Jeff Wear",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/wearhere/GitHubPlusPlus/issues"
+  },
+  "homepage": "https://github.com/wearhere/GitHubPlusPlus"
+}
