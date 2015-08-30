@@ -21,6 +21,8 @@
         });
 
         keyPressListener = function(e) {
+          // Ignore typing in comments.
+          if ($(e.target).closest('input, textarea, [contenteditable]').length) return;
           if (e.keyCode !== 116 /* t */) return;
           if (filePicker) return;
 
