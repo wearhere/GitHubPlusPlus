@@ -8,3 +8,4 @@ node_modules
 src/content.js
 
 *.sublime-workspace
+src/content/templates.js

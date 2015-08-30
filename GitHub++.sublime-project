@@ -11,6 +11,7 @@
       // Compiled files.
       "src/background.js",
       "src/content.js",
+      "src/content/templates.js",
 
       // Don't search minified javascript files.
       "*.min.js"
