@@ -10,6 +10,7 @@
 
       // Compiled files.
       "src/background.js",
+      "src/content.js",
 
       // Don't search minified javascript files.
       "*.min.js"

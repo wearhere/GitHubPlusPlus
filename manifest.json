@@ -8,13 +8,12 @@
     "scripts": [
       "src/background/playAlertSound.js"
     ],
-    "persistent": false  
+    "persistent": false
   },
   "content_scripts": [{
     "matches": ["https://github.com/*"],
     "js": [
-      "src/content/PRs/keyboardShortcuts.js",
-      "src/content/PRs/ignoreWhitespaceButton.js"
+      "src/content.js"
     ],
     "run_at": "document_idle"
   }]
