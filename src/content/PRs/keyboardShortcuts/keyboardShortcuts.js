@@ -37,6 +37,8 @@
 
   // Adds the above shortcuts to the site-wide keyboard shortcuts table
   // under the "Pull request list" section.
+  // HACK(jeff): Add the file picker shortcut here too.
+  // TODO(jeff): Abstract this so other modules can add to the keyboard shortcuts list.
   function addPRShortcutsToPopup(popup) {
     popup.find('.column.one-third:nth-child(3) table').append(Templates.prShortcutsDescription());
   }

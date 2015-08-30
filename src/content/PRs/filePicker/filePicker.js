@@ -6,7 +6,7 @@
   var prContent;
   var filePicker;
 
-  Router.on('start:pr', function(prRef) {
+  Router.on('start:pr-files', function(prRef) {
     var files;
 
     // When opening a PR from the PR list, GitHub will take a moment to load the PR _after_ already
@@ -21,8 +21,8 @@
         });
 
         keyPressListener = function(e) {
-          // Only show the file picker in the diff view.
-          if (!/pull\/\d+\/files/.test(window.location.href)) return;
+          // Ignore typing in comments.
+          if ($(e.target).closest('input, textarea, [contenteditable]').length) return;
           if (e.keyCode !== 116 /* t */) return;
           if (filePicker) return;
 

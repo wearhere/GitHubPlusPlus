@@ -2,16 +2,17 @@
 
 Adds keyboard shortcuts and other stuff to GitHub.
 
-For easy discoverability, the extension amends GitHub's site-wide keyboard shortcut map (press "?" outside a text area) with the shortcuts it adds. Example section:
-
-<img src="shortcuts.png" width=317 />
-
 ## Current Features
 
 * Adds shortcuts to toggle between PR tabs and view diffs without whitespace.
 * Adds a button to view diffs without whitespace for people that prefer that.
 * Enables GitHub's file browser in PRs for the files that have changed in the PR, using Sublime
 Text-style fuzzy-matching logic.
+
+Find the shortcuts for the above in GitHub's site-wide keyboard shortcut map (press "?" outside a
+text area) with the shortcuts it adds. Example section:
+
+<img src="shortcuts.png" width=317 />
 
 ## Installation
 
