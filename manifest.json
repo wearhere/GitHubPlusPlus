@@ -4,17 +4,16 @@
   "description": "Adds keyboard shortcuts and other stuff to GitHub.",
   "version": "0.0.1",
   "author": "Jeffrey Wear",
-  "background": {
-    "scripts": [
-      "src/background/playAlertSound.js"
-    ],
-    "persistent": false
-  },
   "content_scripts": [{
     "matches": ["https://github.com/*"],
     "js": [
-      "src/content.js"
+      "src/globals.js",
+      "src/app.js"
     ],
     "run_at": "document_idle"
-  }]
+  }],
+  "web_accessible_resources": [
+    "assets/Basso.wav",
+    "src/content.js"
+  ]
 }

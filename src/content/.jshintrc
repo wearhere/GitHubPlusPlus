@@ -1,0 +1,29 @@
+{
+  // If you are using SublimeLinter, after modifying this config file, be sure to close and reopen
+  // the file(s) you were editing to see the changes take effect.
+
+  "extends": "../../.jshintrc",
+
+  // Whitelist the browser's global variables so JSHint doesn't complain about them being undefined.
+  "browser": true,
+
+  // Whitelist additional global variables.
+  "globals": {
+    // "devel" globals. We only whitelist `alert` rather than using the "devel" environment so
+    // `console` remains flagged.
+    "alert": false,
+
+    // Our libraries. Attempt to use an environment http://jshint.com/docs/options/#environments if you can.
+    // If these are defined manually, set them to readonly (`false`).
+    "_": false,
+    "$": false,
+    "Events": false,
+
+    // Our global variables.
+    "GPLUSPLUS": false,
+
+    // Our classes.
+    "ElementUtils": true,
+    "Router": true
+  }
+}

@@ -2,12 +2,9 @@
  * Adds shortcuts to PR pages.
  */
 (function() {
-  var prMatch = window.location.href.match(/pull\/\d+/);
-  if (!prMatch) return;
+  var prRef;
 
-  var prRef = prMatch[0];
-
-  document.addEventListener('keypress', function(e) {
+  var keyPressListener = function(e) {
     if (e.altKey) {
       var newHref;
       switch (e.charCode) {
@@ -32,11 +29,11 @@
         if (tab) {
           tab.click();
         } else {
-          chrome.runtime.sendMessage({ method: 'playAlertSound' });
+          new Audio(GPLUSPLUS.alertSoundUrl).play();
         }
       }
     }
-  });
+  };
 
   // Adds the above shortcuts to the site-wide keyboard shortcuts table
   // under the "Pull request list" section.
@@ -73,18 +70,32 @@
     popup.querySelector('.column.one-third:nth-child(3) table').innerHTML += shortcutTable;
   }
 
-  // The popup is always present. Detect it being populated with the shortcuts
-  // by the toggling of the '.shortcuts' class on the popup.
-  var shortcutPopupObserver = new MutationObserver(function(records) {
-    var shortcutPopup = document.querySelector('.facebox-content.shortcuts');
-    if (shortcutPopup) {
-      // The shortcut HTML is recreated every time.
-      addPRShortcutsToPopup(shortcutPopup);
-    }
+  var shortcutPopupObserver;
+
+  Router.on('start:pr', function(localPrRef) {
+    prRef = localPrRef;
+
+    document.addEventListener('keypress', keyPressListener);
+
+    // The popup is always present. Detect it being populated with the shortcuts
+    // by the toggling of the '.shortcuts' class on the popup.
+    shortcutPopupObserver = new MutationObserver(function(records) {
+      var shortcutPopup = document.querySelector('.facebox-content.shortcuts');
+      if (shortcutPopup) {
+        // The shortcut HTML is recreated every time.
+        addPRShortcutsToPopup(shortcutPopup);
+      }
+    });
+
+    shortcutPopupObserver.observe(document.querySelector('.facebox-content'), {
+      attributes: true,
+      attributeFilter: ['class']
+    });
   });
 
-  shortcutPopupObserver.observe(document.querySelector('.facebox-content'), {
-    attributes: true,
-    attributeFilter: ['class']
+  Router.on('stop:pr', function() {
+    document.removeEventListener('keypress', keyPressListener);
+
+    shortcutPopupObserver.disconnect();
   });
 })();
