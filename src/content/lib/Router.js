@@ -3,8 +3,11 @@
  * are arrived at.
  *
  * (For those familiar with Backbone, this is a mashup of `Backbone.Router` and `Backbone.History`,
- * customized for GitHub using `replaceState` to navigate, and for the extension merely observing
- * GitHub's changes rather than instigating changes itself (at the moment)).
+ * customized in the following ways:
+ *  - hooking into `replaceState` rather than popstate events
+ *  - no navigation methods since the extension merely observes GitHub's changes rather than
+ *    instigates changes itself (at the moment)
+ *  - multiple routes can be active at a time.)
  *
  * Client code defines a route by calling `Router.route` with a routing string
  * (http://backbonejs.org/index.html#Router-routes) or regular expression and name. Whenever
@@ -14,8 +17,10 @@
  * If the location changes but the new location matches the same route, the router will _not_ fire
  * another "start" event.
  *
- * When the location changes and the new location matches a different route (or no route), the router
- * will fire a "stop:name" event.
+ * Multiple routes can be active at the same time if they match the same location.
+ *
+ * When the location changes and the new location stops matching a route, the router will fire a
+ * "stop:name" event.
  *
  * The router will also fire a "start" event as appropriate when the page first loads.
  *
@@ -36,7 +41,7 @@ var Router = _.extend({}, Events, {
 
   _routes: [],
 
-  _currentRoute: null,
+  _currentRoutes: [],
 
   start: function() {
     if (this._started) return;
@@ -83,16 +88,19 @@ var Router = _.extend({}, Events, {
   _loadUrl: function() {
     var path = window.location.pathname;
 
-    var routeMatched = _.some(this._routes, function(route) {
-      if (route.route.test(path)) {
-        if (this._currentRoute) {
-          if (route === this._currentRoute) {
-            return true;
-          } else {
-            this.trigger('stop:' + this._currentRoute.name);
-          }
-        }
+    _.each(this._routes, function(route) {
+      var routeMatches = route.route.test(path);
 
+      var currentRouteIndex = this._currentRoutes.indexOf(route);
+      if (currentRouteIndex !== -1) {
+        if (!routeMatches) {
+          this._currentRoutes.splice(currentRouteIndex, 1);
+          this.trigger('stop:' + route.name);
+        }
+        return;
+      }
+
+      if (routeMatches) {
         var params = route.route.exec(path).slice(1);
         params = _.map(params, function(param, i) {
           // Don't decode the search params.
@@ -102,17 +110,9 @@ var Router = _.extend({}, Events, {
 
         this.trigger.apply(this, ['start:' + route.name].concat(params));
 
-        this._currentRoute = route;
-
-        return true;
+        this._currentRoutes.push(route);
       }
     }, this);
-
-    // Unload the current route if we didn't do it already above.
-    if (!routeMatched && this._currentRoute) {
-      this.trigger('stop:' + this._currentRoute.name);
-      this._currentRoute = null;
-    }
   }
 });
 
