@@ -25,10 +25,17 @@
 
     var files;
 
-    // When opening a PR from the PR list, GitHub will take a moment to load the PR _after_ already
+    // When transitioning between commits, GitHub will take a moment to load the PR _after_ already
     // having changed the location.
     ElementUtils.waitForElement('.page-context-loader:not(:visible)', 3 * 1000).then(function() {
-      return ElementUtils.waitForElement('.content', 3 * 1000);
+      // This checks that we've transitioned from the issues list into a PR, or from the PR commit
+      // list to a commit.
+      //
+      // HACK(jeff): The `:visible` is a way to check that we've made the transition without checking
+      // the loading indicator directly, since it doesn't always exist, unlike the indicator that
+      // shows when transitioning between commits. The visible item is the diff stat summary rather
+      // than the list itself, which is collapsed and hidden until you click on the summary.
+      return ElementUtils.waitForElement(':visible + .content', 3 * 1000);
     })
       .done(function(fileList) {
         files = fileList.find('li > a').toArray().map(function(fileLink) {
