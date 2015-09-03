@@ -14,8 +14,8 @@
  * the location changes, and the new location matches the route, the router will fire a "start:name"
  * event whose arguments are the capture(s) from the route or regular expression.
  *
- * If the location changes but the new location matches the same route, the router will _not_ fire
- * another "start" event.
+ * If the location changes but the new location matches the same route, the router will fire a
+ * "restart" event rather than a "start" event.
  *
  * Multiple routes can be active at the same time if they match the same location.
  *
@@ -90,15 +90,7 @@ var Router = _.extend({}, Events, {
 
     _.each(this._routes, function(route) {
       var routeMatches = route.route.test(path);
-
       var currentRouteIndex = this._currentRoutes.indexOf(route);
-      if (currentRouteIndex !== -1) {
-        if (!routeMatches) {
-          this._currentRoutes.splice(currentRouteIndex, 1);
-          this.trigger('stop:' + route.name);
-        }
-        return;
-      }
 
       if (routeMatches) {
         var params = route.route.exec(path).slice(1);
@@ -108,9 +100,15 @@ var Router = _.extend({}, Events, {
           return param ? decodeURIComponent(param) : null;
         });
 
-        this.trigger.apply(this, ['start:' + route.name].concat(params));
-
-        this._currentRoutes.push(route);
+        if (currentRouteIndex === -1) {
+          this._currentRoutes.push(route);
+          this.trigger.apply(this, ['start:' + route.name].concat(params));
+        } else {
+          this.trigger.apply(this, ['restart:' + route.name].concat(params));
+        }
+      } else if (currentRouteIndex !== -1) {
+        this._currentRoutes.splice(currentRouteIndex, 1);
+        this.trigger('stop:' + route.name);
       }
     }, this);
   }

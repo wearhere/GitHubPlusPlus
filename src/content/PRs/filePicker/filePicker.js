@@ -6,12 +6,25 @@
   var prContent;
   var filePicker;
 
-  Router.on('start:pr-files start:commits', function(routeRef) {
+  ['pr-files', 'commits'].forEach(function(route) {
+    Router.on('start:' + route, start);
+    Router.on('stop:' + route, stop);
+    Router.on('restart:' + route, function(routeRef) {
+      // When the user navigates from one commit to another or (I suppose) from one PR to another,
+      // we must reload the file list. The easiest way to do that is just to re-run the entire route.
+      stop();
+      start(routeRef);
+    });
+  });
+
+  function start(routeRef) {
     var files;
 
     // When opening a PR from the PR list, GitHub will take a moment to load the PR _after_ already
     // having changed the location.
-    ElementUtils.waitForElement('.content', 3 * 1000)
+    ElementUtils.waitForElement('.page-context-loader:not(:visible)', 3 * 1000).then(function() {
+      return ElementUtils.waitForElement('.content', 3 * 1000);
+    })
       .done(function(fileList) {
         files = fileList.find('li > a').toArray().map(function(fileLink) {
           return {
@@ -122,12 +135,12 @@
         }
       });
     }
-  });
+  }
 
-  Router.on('stop:pr-files stop:commits', function() {
+  function stop() {
     document.removeEventListener('keypress', keyPressListener);
     hideFilePicker();
-  });
+  }
 
   function hideFilePicker() {
     if (!filePicker) return;
