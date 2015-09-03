@@ -6,12 +6,37 @@
   var prContent;
   var filePicker;
 
-  Router.on('start:pr-files', function(prRef) {
+  ['pr-files', 'commits'].forEach(function(route) {
+    Router.on('start:' + route, start);
+    Router.on('stop:' + route, stop);
+    Router.on('restart:' + route, function(routeRef) {
+      // When the user navigates from one commit to another or (I suppose) from one PR to another,
+      // we must reload the file list. The easiest way to do that is just to re-run the entire route.
+      stop();
+      start(routeRef);
+    });
+  });
+
+  function start(routeRef) {
+    if (keyPressListener) {
+      console.error('File picker routes are stopping and starting out of order.');
+      return;
+    }
+
     var files;
 
-    // When opening a PR from the PR list, GitHub will take a moment to load the PR _after_ already
+    // When transitioning between commits, GitHub will take a moment to load the PR _after_ already
     // having changed the location.
-    ElementUtils.waitForElement('.content', 3 * 1000)
+    ElementUtils.waitForElement('.page-context-loader:not(:visible)', 3 * 1000).then(function() {
+      // This checks that we've transitioned from the issues list into a PR, or from the PR commit
+      // list to a commit.
+      //
+      // HACK(jeff): The `:visible` is a way to check that we've made the transition without checking
+      // the loading indicator directly, since it doesn't always exist, unlike the indicator that
+      // shows when transitioning between commits. The visible item is the diff stat summary rather
+      // than the list itself, which is collapsed and hidden until you click on the summary.
+      return ElementUtils.waitForElement(':visible + .content', 3 * 1000);
+    })
       .done(function(fileList) {
         files = fileList.find('li > a').toArray().map(function(fileLink) {
           return {
@@ -41,10 +66,16 @@
       if (filePicker) return;
 
       filePicker = Templates.filePicker({
-        prRef: prRef,
+        routeRef: routeRef,
       });
 
-      prContent = $('#js-repo-pjax-container').contents().hide();
+      prContent = $('#js-repo-pjax-container')
+        .children()
+        .attr('data-gplusplus-was-hidden', function() {
+          return $(this).css('display');
+        })
+        .hide();
+
       $('#js-repo-pjax-container').prepend(filePicker);
 
       filePicker.find('.js-tree-finder-results').on('mousedown', '.js-navigation-item', function(e) {
@@ -116,12 +147,14 @@
         }
       });
     }
-  });
+  }
 
-  Router.on('stop:pr-files', function() {
+  function stop() {
     document.removeEventListener('keypress', keyPressListener);
+    keyPressListener = null;
+
     hideFilePicker();
-  });
+  }
 
   function hideFilePicker() {
     if (!filePicker) return;
@@ -129,7 +162,11 @@
     filePicker.remove();
     filePicker = null;
 
-    prContent.show();
+    prContent.css('display', function() {
+      var display = $(this).attr('data-gplusplus-was-hidden');
+      $(this).attr('data-gplusplus-was-hidden', '');
+      return display;
+    });
     prContent = null;
   }
 })();

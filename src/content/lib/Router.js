@@ -14,13 +14,13 @@
  * the location changes, and the new location matches the route, the router will fire a "start:name"
  * event whose arguments are the capture(s) from the route or regular expression.
  *
- * If the location changes but the new location matches the same route, the router will _not_ fire
- * another "start" event.
+ * If the location changes but the new location matches the same route, the router will fire a
+ * "restart" event rather than a "start" event.
  *
  * Multiple routes can be active at the same time if they match the same location.
  *
  * When the location changes and the new location stops matching a route, the router will fire a
- * "stop:name" event.
+ * "stop:name" event. All "stop" events will be fired before any "start" or "restart" events.
  *
  * The router will also fire a "start" event as appropriate when the page first loads.
  *
@@ -85,34 +85,44 @@ var Router = _.extend({}, Events, {
     return new RegExp('^' + route + '(?:\\?([\\s\\S]*))?$');
   },
 
+  _getParams: function(route, path) {
+    var params = route.route.exec(path).slice(1);
+    params = _.map(params, function(param, i) {
+      // Don't decode the search params.
+      if (i === params.length - 1) return param || null;
+      return param ? decodeURIComponent(param) : null;
+    });
+    return params;
+  },
+
   _loadUrl: function() {
     var path = window.location.pathname;
 
-    _.each(this._routes, function(route) {
+    var stoppedRoutes = _.difference(this._routes, this._currentRoutes);
+
+    // Stop, restart, and start routes in that order. That way if two routes overlap, teardown
+    // can happen cleanly before start.
+    this._currentRoutes = _.filter(this._currentRoutes, function(route) {
       var routeMatches = route.route.test(path);
-
-      var currentRouteIndex = this._currentRoutes.indexOf(route);
-      if (currentRouteIndex !== -1) {
-        if (!routeMatches) {
-          this._currentRoutes.splice(currentRouteIndex, 1);
-          this.trigger('stop:' + route.name);
-        }
-        return;
+      if (!routeMatches) {
+        this.trigger('stop:' + route.name);
       }
-
-      if (routeMatches) {
-        var params = route.route.exec(path).slice(1);
-        params = _.map(params, function(param, i) {
-          // Don't decode the search params.
-          if (i === params.length - 1) return param || null;
-          return param ? decodeURIComponent(param) : null;
-        });
-
-        this.trigger.apply(this, ['start:' + route.name].concat(params));
-
-        this._currentRoutes.push(route);
-      }
+      return routeMatches;
     }, this);
+
+    _.each(this._currentRoutes, function(route) {
+      var params = this._getParams(route, path);
+      this.trigger.apply(this, ['restart:' + route.name].concat(params));
+    }, this);
+
+    [].push.apply(this._currentRoutes, _.filter(stoppedRoutes, function(route) {
+      var routeMatches = route.route.test(path);
+      if (routeMatches) {
+        var params = this._getParams(route, path);
+        this.trigger.apply(this, ['start:' + route.name].concat(params));
+      }
+      return routeMatches;
+    }, this));
   }
 });
 
