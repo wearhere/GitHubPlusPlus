@@ -18,6 +18,11 @@
   });
 
   function start(routeRef) {
+    if (keyPressListener) {
+      console.error('File picker routes are stopping and starting out of order.');
+      return;
+    }
+
     var files;
 
     // When opening a PR from the PR list, GitHub will take a moment to load the PR _after_ already
@@ -139,6 +144,8 @@
 
   function stop() {
     document.removeEventListener('keypress', keyPressListener);
+    keyPressListener = null;
+
     hideFilePicker();
   }
 
