@@ -6,7 +6,7 @@
   var prContent;
   var filePicker;
 
-  Router.on('start:pr-files', function(prRef) {
+  Router.on('start:pr-files start:commits', function(routeRef) {
     var files;
 
     // When opening a PR from the PR list, GitHub will take a moment to load the PR _after_ already
@@ -41,7 +41,7 @@
       if (filePicker) return;
 
       filePicker = Templates.filePicker({
-        prRef: prRef,
+        routeRef: routeRef,
       });
 
       prContent = $('#js-repo-pjax-container')
@@ -124,7 +124,7 @@
     }
   });
 
-  Router.on('stop:pr-files', function() {
+  Router.on('stop:pr-files stop:commits', function() {
     document.removeEventListener('keypress', keyPressListener);
     hideFilePicker();
   });
