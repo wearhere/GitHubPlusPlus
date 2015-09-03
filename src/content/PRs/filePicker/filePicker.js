@@ -3,6 +3,7 @@
  */
 (function() {
   var keyPressListener;
+  var scrollPosition;
   var prContent;
   var filePicker;
 
@@ -68,6 +69,11 @@
       filePicker = Templates.filePicker({
         routeRef: routeRef,
       });
+
+      scrollPosition = {
+        x: window.scrollX,
+        y: window.scrollY
+      };
 
       prContent = $('#js-repo-pjax-container')
         .children()
@@ -168,5 +174,10 @@
       return display;
     });
     prContent = null;
+
+    if (scrollPosition) {
+      window.scrollTo(scrollPosition.x, scrollPosition.y);
+      scrollPosition = null;
+    }
   }
 })();
