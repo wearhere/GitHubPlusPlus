@@ -44,7 +44,13 @@
         prRef: prRef,
       });
 
-      prContent = $('#js-repo-pjax-container').contents().hide();
+      prContent = $('#js-repo-pjax-container')
+        .children()
+        .attr('data-gplusplus-was-hidden', function() {
+          return $(this).css('display');
+        })
+        .hide();
+
       $('#js-repo-pjax-container').prepend(filePicker);
 
       filePicker.find('.js-tree-finder-results').on('mousedown', '.js-navigation-item', function(e) {
@@ -129,7 +135,11 @@
     filePicker.remove();
     filePicker = null;
 
-    prContent.show();
+    prContent.css('display', function() {
+      var display = $(this).attr('data-gplusplus-was-hidden');
+      $(this).attr('data-gplusplus-was-hidden', '');
+      return display;
+    });
     prContent = null;
   }
 })();
