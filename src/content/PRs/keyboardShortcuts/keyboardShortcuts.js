@@ -25,7 +25,7 @@
       if (newHref) {
         // Don't actually attempt to go to the href because we don't want to
         // trigger a page reload. Instead, click the tab with this href.
-        var tab = document.querySelector('.js-pull-request-tab[href$="' + newHref + '"]');
+        var tab = document.querySelector('.tabnav-tab[href$="' + newHref + '"]');
         if (tab) {
           tab.click();
         } else {

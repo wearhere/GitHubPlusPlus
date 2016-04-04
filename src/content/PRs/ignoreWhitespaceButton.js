@@ -1,10 +1,10 @@
 /**
  * Adds a button to PR pages to load the diff with the ignore whitespace button set.
  */
-Router.on('start:pr', function(prRef) {
+Router.on('start:pr-files', function(prRef) {
   // When opening a PR from the PR list, GitHub will take a moment to load the PR _after_ already
   // having changed the location.
-  ElementUtils.waitForElement('.js-pull-request-tab[href$="' + prRef + '/files"]', 3 * 1000)
+  ElementUtils.waitForElement('.tabnav-tab.selected[href$="' + prRef + '/files"]', 3 * 1000)
     .done(function(diffTab) {
       var IGNORE_WHITESPACE_BUTTON_CLASS = 'js-gplusplus-ignore-whitespace';
 
@@ -14,7 +14,7 @@ Router.on('start:pr', function(prRef) {
 
       diffTab.append(ignoreWhitespaceButton);
 
-      diffTab[0].addEventListener('click', function(e) {
+      diffTab[0].parentElement.addEventListener('click', function(e) {
         if (!e.target.closest('.' + IGNORE_WHITESPACE_BUTTON_CLASS)) return;
 
         e.preventDefault();
