@@ -1,1 +1,1 @@
-../../../../node_modules/gulp-handlebars/node_modules/handlebars/dist/handlebars.runtime.js
+../../../../node_modules/handlebars/dist/handlebars.runtime.js
